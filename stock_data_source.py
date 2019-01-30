@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import daily
+import monthly
 
 def get_stock(ticker, start_date, end_date, s_window, l_window):
     try:
@@ -50,6 +51,7 @@ with open(output_file) as f:
     lines = f.read().splitlines()
 
     daily.strategy(lines)
+    monthly.strategy(lines)
 
 
 

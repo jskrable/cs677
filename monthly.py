@@ -14,7 +14,7 @@ def strategy(lines):
 	for line in lines:
 		row = line.split(',')
 
-		day = row[4]
+		day = row[2]
 		price = float(row[9])
 
 		try:
