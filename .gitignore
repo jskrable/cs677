@@ -39,3 +39,9 @@ Thumbs.db
 # Datasets #
 ############
 datasets/*
+
+# Python Stuff #
+################
+__pycache__/
+*.py[cod]
+*$py.class
