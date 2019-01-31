@@ -7,7 +7,7 @@ jack skrable
 """
 
 import os
-import summarize as s
+import summarize
  
 ticker = 'SYK'
 
@@ -23,5 +23,5 @@ with open(output_file) as f:
     lines = f.read().splitlines()
 
     # Run summarize for day and month
-    s.summary(lines, 'day')
-    s.summary(lines, 'month')
+    daily = summarize.interval(lines, 'day')
+    monthly = summarize.interval(lines, 'month')

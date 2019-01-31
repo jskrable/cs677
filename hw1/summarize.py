@@ -8,13 +8,14 @@ jack skrable
 
 
 # Function to summarize % change is adj. close if held for a specific interval
-def summary(lines, interval):
+def interval(lines, interval):
 
 	# Omit header row
 	lines = lines[1:]
 	# Init dicts to store data
 	data = {}
 	summary = {}
+	best = {'period': '', 'avg_return': 0}
 
 	# Loop through lines in dataset
 	for line in lines:
@@ -59,16 +60,24 @@ def summary(lines, interval):
 		# Add to summary dict
 		summary.update({key: {'summary': {'min': minimum, 'max': maximum, 'average': avg, 'median': med}}})
 
-	print('Data -----------------------')
-	print(summary)
+		if best and avg > best['avg_return']:
+			best.update({'period': key, 'avg_return': avg})
+		
+
+	# print('Data -----------------------')
+	# print(summary)
+
+	print('Best -----------------------')
+	print(best)
+
+	return summary
 		
 
 # Function to get median value of a list
 def median(data):
-
 	data.sort()
 	mid = int((len(data)-1)/2)
-
+	# If even list return avg of two middle values
 	if len(data) % 2:
 		return data[mid]
 	else:
