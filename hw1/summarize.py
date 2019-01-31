@@ -18,10 +18,28 @@ def interval(lines, interval):
 	best = {'period': '', 'avg_return': 0}
 
 	# Loop through lines in dataset
-	for line in lines:
-		# Split csv string
+	for i, line in enumerate(lines):
+
+		# Split string to list
 		row = line.split(',')
+		# Split previous row into list
+		compare_row = lines[i-1].split(',')
+		price = 0
+		compare_price = 0
+
 		# Choose time span to hold stock for
+		if interval == 'day':
+			day = row[4]
+			price = float(row[9])
+			compare_price = float(compare_row[9])
+		else:
+			month = row[2]
+			# Check for month change
+			if compare_row[2] != month:
+				price = float(row[9])
+				compare_price = float(compare_row[9])
+
+
 		hold = row[4] if interval == 'day' else row[2]
 		# Get adj. closing price
 		price = float(row[9])
