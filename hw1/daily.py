@@ -18,20 +18,34 @@ def strategy(lines):
 		price = float(row[9])
 
 		try:
-			data[day].append(price)
+			data[day]['prices'].append(price)
 			pass
 		except KeyError as e:
-			data.update({day: [price]})
+			data.update({day: {'prices': [price]}})
+
+
 
 	for key in data:
 
-		minimum = min(data[key])
-		maximum = max(data[key])
-		avg = (sum(data[key])/len(data[key]))
-		med = median(data[key])
+		prices = data[key]['prices']
+		changes = []
+		for i, val in enumerate(prices):
+			change = ((val - prices[i-1])/prices[i-1])
+			changes.append(change)
 
-		summary.update({key: {'min': minimum, 'max': maximum, 'average': avg, 'median': med}})
+		data[key].update({'changes': changes})
+		
+		# print('DATA--------------')
+		# print(data)
 
+		minimum = min(data[key]['changes'])
+		maximum = max(data[key]['changes'])
+		avg = (sum(data[key]['changes'])/len(data[key]['changes']))
+		med = median(data[key]['changes'])
+
+		summary.update({key: {'summary': {'min': minimum, 'max': maximum, 'average': avg, 'median': med}}})
+
+	print('Daily Data -----------------------')
 	print(summary)
 		
 

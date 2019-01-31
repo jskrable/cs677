@@ -14,14 +14,14 @@ def strategy(lines):
 	for line in lines:
 		row = line.split(',')
 
-		day = row[2]
+		month = row[2]
 		price = float(row[9])
 
 		try:
-			data[day]['prices'].append(price)
+			data[month]['prices'].append(price)
 			pass
 		except KeyError as e:
-			data.update({day: {'prices': [price]}})
+			data.update({month: {'prices': [price]}})
 
 
 
@@ -45,6 +45,7 @@ def strategy(lines):
 
 		summary.update({key: {'summary': {'min': minimum, 'max': maximum, 'average': avg, 'median': med}}})
 
+	print('Monthly Data -----------------------------')
 	print(summary)
 		
 
