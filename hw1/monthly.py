@@ -25,6 +25,14 @@ def strategy(lines):
 
 	for key in data:
 
+		prices = data[key]
+		for i, val in enumerate(prices):
+			print('Current: ',val)
+			print('Prev: ', prices[i-1])
+			change = ((val - prices[i-1])/prices[i-1])
+			print('Change: ',change)
+
+
 		minimum = min(data[key])
 		maximum = max(data[key])
 		avg = (sum(data[key])/len(data[key]))
@@ -32,7 +40,7 @@ def strategy(lines):
 
 		summary.update({key: {'min': minimum, 'max': maximum, 'average': avg, 'median': med}})
 
-	print(summary)
+	#print(summary)
 		
 
 
