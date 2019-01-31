@@ -1,3 +1,4 @@
+#! /usr/bin/python3
 # -*- coding: utf-8 -*-
 """
 Created on Mon Nov  5 14:37:29 2018
@@ -40,11 +41,14 @@ start_date='2014-01-01'
 end_date='2018-12-31'
 s_window = 14
 l_window = 50
-input_dir = r'C:\Users\jskrable\code\cs677\datasets'
+if os.name == 'posix':
+    input_dir = r'/home/jskrable/code/cs677/datasets'
+else:
+    input_dir = r'C:\Users\jskrable\code\cs677\datasets'
 output_file = os.path.join(input_dir, ticker + '.csv')
 
-# df = get_stock(ticker, start_date, end_date, s_window, l_window)
-# df.to_csv(output_file, index=False)
+df = get_stock(ticker, start_date, end_date, s_window, l_window)
+df.to_csv(output_file, index=False)
 
 
 with open(output_file) as f:
