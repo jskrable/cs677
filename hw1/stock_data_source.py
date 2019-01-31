@@ -47,8 +47,8 @@ else:
     input_dir = r'C:\Users\jskrable\code\cs677\datasets'
 output_file = os.path.join(input_dir, ticker + '.csv')
 
-df = get_stock(ticker, start_date, end_date, s_window, l_window)
-df.to_csv(output_file, index=False)
+# df = get_stock(ticker, start_date, end_date, s_window, l_window)
+# df.to_csv(output_file, index=False)
 
 
 with open(output_file) as f:
