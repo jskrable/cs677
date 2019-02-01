@@ -9,6 +9,8 @@ jack skrable
 import os
 import daily
 import monthly
+import consecutive_drop as cd
+import short_ma as sma
  
 ticker = 'SYK'
 
@@ -26,3 +28,11 @@ with open(output_file) as f:
     # Run summarize for day and month
     daily = daily.summarize(lines)
     monthly = monthly.summarize(lines)
+
+    print('Consecutive Losses -------------------------')
+    for w in range(1,6):
+    	print(cd.summarize(lines,w))
+
+
+    print('Short MA -----------------------------------')
+    print(sma.summarize((lines)))
