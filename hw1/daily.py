@@ -51,12 +51,12 @@ def summarize(lines):
 
 		if best and avg > best['avg_return']:
 			best.update({'period': key, 'avg_return': avg})
-		
-
-	print('Daily Summary -----------------------')
+	
+	print()	
+	print('Daily Summary ----------------------------')
 	print(summary)
-
-	print('Best  Day----------------------------')
+	print()
+	print('Best  Day --------------------------------')
 	print(best)
 
 	return summary

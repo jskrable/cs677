@@ -72,11 +72,11 @@ def summarize(lines):
 		if best and avg > best['avg_return']:
  			best.update({'period': key, 'avg_return': avg})
 		
-
-	print('Monthly Summary -----------------------')
+	print()
+	print('Monthly Summary -----------------------------')
 	print(summary)
-
-	print('Best  Month----------------------------')
+	print()
+	print('Best  Month ---------------------------------')
 	print(best)
 
 	return summary
