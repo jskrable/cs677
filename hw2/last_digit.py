@@ -19,5 +19,17 @@ else:
 output_file = os.path.join(input_dir, ticker + '_digit_analysis.csv')
 
 data = pd.read_csv(output_file)
+data['error'] = data.apply(lambda x : abs(x['digit_frequency'] - 0.1), axis=1)
 
-print(data)
+# print(data)
+
+max_abs = max(data['error'])
+med_abs = data['error'].median()
+mean_abs = data['error'].mean()
+root_mean_sq = (sum(data['error']**2)/len(data))**(0.5)
+
+print('Max Absolute Error: ', max_abs)
+print('Median Absolute Error: ', med_abs)
+print('Mean Absolute Error: ', mean_abs)
+print('Root Mean Squared Error: ', root_mean_sq)
+
