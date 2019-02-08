@@ -7,7 +7,11 @@ jack skrable
 """
 
 import os
-import summarize
+import daily
+import monthly
+import consecutive_drop as cd
+import short_ma as sma
+import clairvoyant as cl
  
 ticker = 'SYK'
 
@@ -23,5 +27,21 @@ with open(output_file) as f:
     lines = f.read().splitlines()
 
     # Run summarize for day and month
-    daily = summarize.interval(lines, 'day')
-    monthly = summarize.interval(lines, 'month')
+    daily = daily.summarize(lines)
+    monthly = monthly.summarize(lines)
+
+    # Run for consecutive loss strategy 
+    print()
+    print('Consecutive Losses -------------------------')
+    for w in range(1,6):
+    	print(cd.summarize(lines,w))
+
+    # Run for short moving average strategy
+    print()
+    print('Short MA -----------------------------------')
+    print(sma.summarize((lines)))
+
+    # Run when knowing the future
+    print()
+    print('Know the Future-----------------------------')
+    print(cl.predict(lines))
