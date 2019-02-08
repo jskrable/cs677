@@ -36,10 +36,6 @@
 ehthumbs.db
 Thumbs.db
 
-# Datasets #
-############
-datasets/*
-
 # Python Stuff #
 ################
 __pycache__/
