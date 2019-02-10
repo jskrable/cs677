@@ -12,7 +12,7 @@ import monthly
 import consecutive_drop as cd
 import short_ma as sma
 import clairvoyant as cl
- 
+
 ticker = 'SYK'
 
 # Get path of dataset
@@ -30,11 +30,11 @@ with open(output_file) as f:
     daily = daily.summarize(lines)
     monthly = monthly.summarize(lines)
 
-    # Run for consecutive loss strategy 
+    # Run for consecutive loss strategy
     print()
     print('Consecutive Losses -------------------------')
-    for w in range(1,6):
-    	print(cd.summarize(lines,w))
+    for w in range(1, 6):
+        print(cd.summarize(lines, w))
 
     # Run for short moving average strategy
     print()
@@ -45,3 +45,17 @@ with open(output_file) as f:
     print()
     print('Know the Future-----------------------------')
     print(cl.predict(lines))
+
+    pos = 0
+    neg = 0
+    lines = lines[1:]
+    for line in lines:
+        row = line.split(',')
+        if float(row[10]) > 0:
+            pos += 1
+        else:
+            neg += 1
+
+    print()
+    print("Gains: ", pos)
+    print("Losses: ", neg)
