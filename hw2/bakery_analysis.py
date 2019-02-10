@@ -19,9 +19,30 @@ output_file = os.path.join(input_dir, 'BreadBasket_DMS_output.csv')
 
 # Read file into pandas dataframe
 data = pd.read_csv(output_file)
+
+# print(data.groupby('Item').agg({'Item': 'count'}))
 # Concat date field
 # TODO find more efficient way to do this
 data['Date'] = data.apply(lambda x : str(x['Year'])+str(x['Month'])+str(x['Day']), axis=1)
+
+
+# Function to get avg group size based on number of drinks per transaction
+def group(data):
+	# Get number of drinks per transaction
+	group = data.groupby('Transaction')['Category'].apply(lambda x : (x == 'Drink').sum()).reset_index(name='Drinks')
+	print('Average group size per transaction based on drink count',round(group['Drinks'].mean(),4))
+
+
+# Function to analyze based on type of product
+def category(data):
+	mean_prices = data.groupby('Category').agg({'Item_Price': 'mean'})
+	for i, x in mean_prices['Item_Price'].items():
+		print('Average price for',i,'is',round(x,2))
+	rev = data.groupby('Category').agg({'Item_Price': 'sum'})
+	for i, x in rev['Item_Price'].items():
+		print('Total revenue for',i,'is',round(x,2))
+
+	print('Shop makes most money from',rev['Item_Price'].idxmax())
 
 
 # Function to get the minimum number of baristas per day
@@ -82,6 +103,10 @@ def output(data):
 	popularity(data)
 	print('Hiring--------------------------------------------------------------')
 	baristas(data)
+	print('Categories----------------------------------------------------------')
+	category(data)
+	print('Group Size----------------------------------------------------------')
+	group(data)
 
 output(data)
 
