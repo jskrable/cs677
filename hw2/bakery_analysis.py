@@ -67,9 +67,32 @@ def popularity(data):
 	print('Most popular item is',items['Item'].idxmax(),'with',items['Item'].max(),'purchases')
 	print('Least popular item is',items['Item'].idxmin(),'with',items['Item'].min(),'purchases')
 
-	# TODO work on most popular combo of 2 items
-	combos = data.groupby(['Transaction','Item']).agg({'Item': 'count'})
-	# print(combos)
+	# TODO try to do this with pandas?
+	combos = {}
+	# Populate dict with key of transaction id and list of items bought
+	for i,x in data.iterrows():
+		try: 
+			combos[x['Transaction']].append(x['Item'])
+		except KeyError:
+			combos.update({x['Transaction']: [x['Item']]})
+
+    # Drop anything with only one item
+	combos = {x:combos[x] for x in combos.keys() if len(combos[x]) > 1}
+	# Sort list values
+	combos = {x:sorted(combos[x]) for x in combos.keys()}
+
+	# New dict with counts based on stringified item lists
+	combo_count = {}
+	for x in combos:
+		try:
+			combo_count[str(combos[x])] += 1
+		except KeyError:
+			combo_count.update({str(combos[x]): 1})
+
+    # Get most popular combination
+	pop_combo = max(combo_count, key=combo_count.get)
+	pop_combo_count = combo_count[pop_combo]
+	print('Most popular combination of items is',pop_combo,'with',pop_combo_count,'purchases')
 
 
 # Function to get business by time interval
