@@ -20,8 +20,38 @@ else:
 output_file = os.path.join(input_dir, ticker + '.csv')
 
 # Read file into pandas dataframe
-data = pd.read_csv(output_file)
+df = pd.read_csv(output_file)
+
+# Get stats for whole dataset
+std = df['Adj Close'].std()
+
+# Helper functions
+def net(week):
+    week = week.to_numpy()
+    return (week[-1] - week[0])
+
+def vol(week):
+    w_std = week.std()
+    return True if w_std > std else False
 
 
+df['Date'] = pd.to_datetime(df['Date']) - pd.to_timedelta(7, unit='d')
 
+weekly = df.groupby([pd.Grouper(key='Date', freq='W')])['Weekday','Adj Close']
+
+for key,item in weekly:
+
+    item.loc['Vol'] = vol(item['Adj Close'])
+    item.loc['Net'] = net(item['Adj Close'])
+    df.update(item)
+
+print(df)
+
+    
+    
+
+# df = df.groupby(['Name', pd.Grouper(key='Date', freq='W-MON')])['Quantity']
+#        .sum()
+#        .reset_index()
+#        .sort_values('Date')
 
