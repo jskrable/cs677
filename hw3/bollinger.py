@@ -31,6 +31,8 @@ shares = 0
 results = {}
 
 
+# NEED TO CHANGE ORDER OF LOOPS 
+# not getting the right data
 # Loop through Ws
 for w in W:
 	# Update df to inlude W-moving avg and std
@@ -48,25 +50,24 @@ for w in W:
 
 		for k in K:
 
-			print(close)
-			print(ma)
-			print(std)
-
-			if close < (ma - (k*std)) and shares == 0:
-				shares = 100/df['Adj Close']
-
-
-			elif close > (ma - (k*std)) and shares > 0:
-				net = shares * 100
-				shares = 0
-
-			else:
-				net = 0
-
 			key = str(w)+'_'+str(k)
-			results.update({key: net})
+			results.update({key: []})
 
-# print(results)
+			try: 
+				# print(close < ma - k*std and shares == 0)
+				if close < (ma - (k*std)) and shares == 0:
+					shares = 100/close
+					print('Bought',shares,'shares')
+
+				elif close > (ma + (k*std)) and shares > 0:
+					net = shares*close
+					results[key].append(net)
+					shares = 0
+				
+			except ValueError as e:
+				print(e)
+
+print(results)
 
 
 
