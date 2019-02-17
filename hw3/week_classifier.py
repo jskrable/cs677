@@ -41,9 +41,10 @@ weekly = df.groupby([pd.Grouper(key='Date', freq='W')])['Weekday','Adj Close']
 
 for key,item in weekly:
 
-    item.loc['Vol'] = vol(item['Adj Close'])
-    item.loc['Net'] = net(item['Adj Close'])
-    df.update(item)
+    item['Vol'] = vol(item['Adj Close'])
+    item['Net'] = net(item['Adj Close'])
+    print(item)
+    # df.update(item)
 
 print(df)
 
