@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 """
-strategies.py
+week_classifier.py
 02-17-19
 jack skrable
 """
@@ -33,6 +33,13 @@ def net(week):
 def vol(week):
     w_std = week.std()
     return True if w_std > std else False
+
+def score(week):
+
+    net = net(week)
+    vol = vol(week)
+
+    # Some combination of the two vars returns either 1 for a good week or 0 for a bad one
 
 
 df['Date'] = pd.to_datetime(df['Date']) - pd.to_timedelta(7, unit='d')
