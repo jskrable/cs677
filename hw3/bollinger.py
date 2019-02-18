@@ -77,7 +77,7 @@ for key in results:
 # Plot points
 x = [x.split('_')[0] for x, y in results.items()]
 y = [x.split('_')[1] for x, y in results.items()]
-c = ['green' if val > 0 else 'red' for i, val in enumerate(s)]
+c = ['green' if y['avg'] > 0 else 'red' for x,y in results.items()]
 s = [abs(y['avg']*10) for x, y in results.items()]
 print(c)
 
