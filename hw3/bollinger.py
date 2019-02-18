@@ -23,86 +23,76 @@ output_file = os.path.join(input_dir, ticker + '.csv')
 # Read file into pandas dataframe
 df = pd.read_csv(output_file)
 
-# Get lists of w and k values
-W = [x for x in range(10,101,10)]
-K = [0.1*x for x in range(0,31,5)]
 
-# Init vars 
-shares = 0
-results = {}
+def bollinger(df):
 
+	# Get lists of w and k values
+	W = [x for x in range(10,101,10)]
+	K = [0.1*x for x in range(0,31,5)]
 
-# Making trades
-print('Simulating trades...')
-for w in W:
-	# Update df to inlude W-moving avg and std
-	df['W_MA'] = df['Adj Close'].rolling(window=w, min_periods=1).mean()
-	df['W_Std'] = df['Adj Close'].rolling(window=w, min_periods=1).std()
+	# Init vars 
+	shares = 0
+	results = {}
 
-	for k in K:
+	# Making trades
+	print('Simulating trades...')
+	for w in W:
+		# Update df to inlude W-moving avg and std
+		df['W_MA'] = df['Adj Close'].rolling(window=w, min_periods=1).mean()
+		df['W_Std'] = df['Adj Close'].rolling(window=w, min_periods=1).std()
 
-		print('Trying w=',w,'k=',k)
-		key = str(w)+'_'+str(k)
-		results.update({key: {'values': []}})
+		for k in K:
+			# Print current simulation to console
+			print('Trying w=',w,'k=',k)
+			key = str(w)+'_'+str(k)
+			# Create new entry in results
+			results.update({key: {'values': []}})
 
 			# Loop through dataset
-		for i, row in df.iterrows():
+			for i, row in df.iterrows():
 
-			close = row['Adj Close']
-			ma = row['W_MA']
-			std = row['W_Std']
+				close = row['Adj Close']
+				ma = row['W_MA']
+				std = row['W_Std']
 
-			try: 
-				# print(close < ma - k*std and shares == 0)
-				if close < (ma - (k*std)) and shares == 0:
-					shares = 100/close
-					# print('Bought',shares,'shares')
+				try: 
+					# print(close < ma - k*std and shares == 0)
+					if close < (ma - (k*std)) and shares == 0:
+						shares = 100/close
+						# print('Bought',shares,'shares')
 
-				elif close > (ma + (k*std)) and shares > 0:
-					net = 100-(shares*close)
-					results[key]['values'].append(net)
-					shares = 0
-				
-			except ValueError as e:
-				print(e)
+					elif close > (ma + (k*std)) and shares > 0:
+						net = 100-(shares*close)
+						results[key]['values'].append(net)
+						shares = 0
+					
+				except ValueError as e:
+					print(e)
 
-# Analyzing results
-print('Analyzing results...')
-for key in results:
-	returns = np.asarray(results[key]['values'])
-	avg = np.average(returns)
-	results[key].update({'avg':avg})
+	# Analyzing results
+	print('Analyzing results...')
+	for key in results:
+		returns = np.asarray(results[key]['values'])
+		avg = np.average(returns)
+		results[key].update({'avg':avg})
+
+	# Return trade results
+	return results
 
 
-# Plot points
-x = [x.split('_')[0] for x, y in results.items()]
-y = [x.split('_')[1] for x, y in results.items()]
-c = ['green' if y['avg'] > 0 else 'red' for x,y in results.items()]
-s = [abs(y['avg']*10) for x, y in results.items()]
-print(c)
+def scatterplot(data):
 
-print('Displaying scatterplot...')
-# for i, val in enumerate(s):
-# 	print(x[i],y[i],val)
-# 	color = 'green' if val > 0 else 'red'
-# 	print(val > 0)
-# 	print(color)
-# 	plt.scatter(x[i], y[i], s=(s[i]*2), c=('green' if val > 0 else 'red'))
+	# Plot points
+	x = [x.split('_')[0] for x, y in data.items()]
+	y = [x.split('_')[1] for x, y in data.items()]
+	c = ['green' if y['avg'] > 0 else 'red' for x,y in data.items()]
+	s = [abs(y['avg']*10) for x, y in data.items()]
 
-plt.scatter(x,y,s=s,color=c)
-plt.show()
+	print('Displaying scatterplot...')
+	plt.scatter(x,y,s=s,color=c)
+	plt.show()
 
 
 
 
-
-
-
-
-
-
-
-
-# df['W_MA'] = df['Adj Close'].rolling(window=W, min_periods=1).mean()
-# df['W_Std'] = df['Adj Close'].rolling(window=W, min_periods=1).std()
-
+scatterplot(bollinger(df))
