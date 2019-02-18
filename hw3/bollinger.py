@@ -9,6 +9,7 @@ jack skrable
 import os
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 ticker = 'SYK'
 
@@ -31,43 +32,68 @@ shares = 0
 results = {}
 
 
-# NEED TO CHANGE ORDER OF LOOPS 
-# not getting the right data
-# Loop through Ws
+# Making trades
+print('Simulating trades...')
 for w in W:
 	# Update df to inlude W-moving avg and std
 	df['W_MA'] = df['Adj Close'].rolling(window=w, min_periods=1).mean()
 	df['W_Std'] = df['Adj Close'].rolling(window=w, min_periods=1).std()
 
-	# Loop through dataset
-	for i, row in df.iterrows():
+	for k in K:
 
-		close = row['Adj Close']
-		ma = row['W_MA']
-		std = row['W_Std']
+		print('Trying w=',w,'k=',k)
+		key = str(w)+'_'+str(k)
+		results.update({key: {'values': []}})
 
-		# print(pd.isnull(pd.Series(close,ma,std)))
+			# Loop through dataset
+		for i, row in df.iterrows():
 
-		for k in K:
-
-			key = str(w)+'_'+str(k)
-			results.update({key: []})
+			close = row['Adj Close']
+			ma = row['W_MA']
+			std = row['W_Std']
 
 			try: 
 				# print(close < ma - k*std and shares == 0)
 				if close < (ma - (k*std)) and shares == 0:
 					shares = 100/close
-					print('Bought',shares,'shares')
+					# print('Bought',shares,'shares')
 
 				elif close > (ma + (k*std)) and shares > 0:
-					net = shares*close
-					results[key].append(net)
+					net = 100-(shares*close)
+					results[key]['values'].append(net)
 					shares = 0
 				
 			except ValueError as e:
 				print(e)
 
-print(results)
+# Analyzing results
+print('Analyzing results...')
+for key in results:
+	returns = np.asarray(results[key]['values'])
+	avg = np.average(returns)
+	results[key].update({'avg':avg})
+
+
+# Plot points
+x = [x.split('_')[0] for x, y in results.items()]
+y = [x.split('_')[1] for x, y in results.items()]
+s = [y['avg'] for x, y in results.items()]
+c = ['green' if val > 0 else 'red' for i, val in enumerate(s)]
+print(c)
+
+print('Displaying scatterplot...')
+# for i, val in enumerate(s):
+# 	print(x[i],y[i],val)
+# 	color = 'green' if val > 0 else 'red'
+# 	print(val > 0)
+# 	print(color)
+# 	plt.scatter(x[i], y[i], s=(s[i]*2), c=('green' if val > 0 else 'red'))
+
+plt.scatter(x,y,s=s,c=c)
+plt.show()
+
+
+
 
 
 
