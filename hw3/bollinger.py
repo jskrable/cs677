@@ -77,8 +77,8 @@ for key in results:
 # Plot points
 x = [x.split('_')[0] for x, y in results.items()]
 y = [x.split('_')[1] for x, y in results.items()]
-s = [y['avg'] for x, y in results.items()]
 c = ['green' if val > 0 else 'red' for i, val in enumerate(s)]
+s = [abs(y['avg']*10) for x, y in results.items()]
 print(c)
 
 print('Displaying scatterplot...')
@@ -89,7 +89,7 @@ print('Displaying scatterplot...')
 # 	print(color)
 # 	plt.scatter(x[i], y[i], s=(s[i]*2), c=('green' if val > 0 else 'red'))
 
-plt.scatter(x,y,s=s,c=c)
+plt.scatter(x,y,s=s,color=c)
 plt.show()
 
 
