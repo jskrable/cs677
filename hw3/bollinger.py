@@ -90,6 +90,8 @@ def scatterplot(data):
 
 	print('Displaying scatterplot...')
 	plt.scatter(x,y,s=s,color=c)
+	plt.xlabel('W')
+	plt.ylabel('k')
 	plt.show()
 
 
