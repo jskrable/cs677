@@ -34,7 +34,7 @@ std = close.std()
 
 outliers = [x for x in close if abs(mean - x) > 2*std]
 
-print(size)
-print(len(outliers))
+print('Standard deviation of set is:',std)
+print('Data points outside 2 standard deviations:',len(outliers))
 # Should be ~5%
-print((len(outliers)/size)*100, '% outside')
+print('Portion of outliers:',(len(outliers)/size)*100, '% outside')

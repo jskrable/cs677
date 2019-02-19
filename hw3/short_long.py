@@ -91,8 +91,8 @@ def scatterplot(data):
 
 	print('Displaying scatterplot...')
 	plt.scatter(x,y,s=s,color=c)
-	plt.xlabel('Short Moving Average')
-	plt.ylabel('Long Moving Average')
+	plt.xlabel('Short MA Window')
+	plt.ylabel('Long MA Window')
 	plt.show()
 
 

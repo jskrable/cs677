@@ -31,6 +31,7 @@ def net(week):
     return (week[-1] - week[0])
 
 def vol(week):
+    # Change comparison to std dev of dataset up to this point?
     w_std = week.std()
     return True if w_std > std else False
 
@@ -38,7 +39,6 @@ def score(week):
 
     net = net(week)
     vol = vol(week)
-
     # Some combination of the two vars returns either 1 for a good week or 0 for a bad one
 
 
@@ -46,20 +46,17 @@ df['Date'] = pd.to_datetime(df['Date']) - pd.to_timedelta(7, unit='d')
 
 weekly = df.groupby([pd.Grouper(key='Date', freq='W')])['Weekday','Adj Close']
 
-for key,item in weekly:
+# Add new columns with defaults
+df['Vol'] = False
+df['Net'] = 0.0
 
-    item['Vol'] = vol(item['Adj Close'])
-    item['Net'] = net(item['Adj Close'])
-    print(item)
-    # df.update(item)
+# Loop thru weeks and update df columns
+for key,week in weekly:
+
+    week['Vol'] = vol(week['Adj Close'])
+    week['Net'] = net(week['Adj Close'])
+    df.update(week)
 
 print(df)
 
-    
-    
-
-# df = df.groupby(['Name', pd.Grouper(key='Date', freq='W-MON')])['Quantity']
-#        .sum()
-#        .reset_index()
-#        .sort_values('Date')
 
