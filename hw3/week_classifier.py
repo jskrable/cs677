@@ -9,6 +9,7 @@ jack skrable
 import os
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import cProfile
 
 ticker = 'SYK'
@@ -60,5 +61,9 @@ def group_apply(data):
     df['Net'] = weekly.apply(grp_net)['Net']
     df['Vol'] = weekly.apply(grp_vol)['Vol']
 
+weekly.apply(grp_net)['Net'].hist()
+plt.show()
 group_apply(weekly)
+
+
 
