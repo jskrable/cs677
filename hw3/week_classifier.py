@@ -9,6 +9,7 @@ jack skrable
 import os
 import pandas as pd
 import numpy as np
+import cProfile
 
 ticker = 'SYK'
 
@@ -35,28 +36,29 @@ def vol(week):
     w_std = week.std()
     return True if w_std > std else False
 
-def score(week):
+def grp_vol(grp):
+    grp['Vol'] = vol(grp['Adj Close'])
+    return grp
 
+def grp_net(grp):
+    grp['Net'] = net(grp['Adj Close'])
+    return grp
+
+def score(week):
     net = net(week)
     vol = vol(week)
     # Some combination of the two vars returns either 1 for a good week or 0 for a bad one
 
-
+print('Grouping by week-------------------------------------')
+# Ensure datetime in correct format
 df['Date'] = pd.to_datetime(df['Date']) - pd.to_timedelta(7, unit='d')
+# Group by week, beginning sunday
+weekly = df.groupby([pd.Grouper(key='Date', freq='W')])['Weekday','Adj Close','Return']
 
-weekly = df.groupby([pd.Grouper(key='Date', freq='W')])['Weekday','Adj Close']
+print('Applying group functions-----------------------------')
+def group_apply(data):
+    df['Net'] = weekly.apply(grp_net)['Net']
+    df['Vol'] = weekly.apply(grp_vol)['Vol']
 
-# Add new columns with defaults
-df['Vol'] = False
-df['Net'] = 0.0
-
-# Loop thru weeks and update df columns
-for key,week in weekly:
-
-    week['Vol'] = vol(week['Adj Close'])
-    week['Net'] = net(week['Adj Close'])
-    df.update(week)
-
-print(df)
-
+group_apply(weekly)
 

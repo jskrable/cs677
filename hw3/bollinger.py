@@ -69,11 +69,11 @@ def bollinger(df):
 				except ValueError as e:
 					print(e)
 
-	# Analyzing results
+	# Get average return from results
 	print('Analyzing results...')
 	for key in results:
 		returns = np.asarray(results[key]['values'])
-		avg = np.average(returns)
+		avg = np.average(returns) if len(returns) > 0 else 0.0
 		results[key].update({'avg':avg})
 
 	# Return trade results
@@ -85,7 +85,9 @@ def scatterplot(data):
 	# Plot points
 	x = [x.split('_')[0] for x, y in data.items()]
 	y = [x.split('_')[1] for x, y in data.items()]
+	# Set color of points
 	c = ['green' if y['avg'] > 0 else 'red' for x,y in data.items()]
+	# Increase size for visibility
 	s = [abs(y['avg']*10) for x, y in data.items()]
 
 	print('Displaying scatterplot...')
