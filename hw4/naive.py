@@ -24,7 +24,29 @@ output_file = os.path.join(input_dir, ticker + '.csv')
 # Read file into pandas dataframe
 df = pd.read_csv(output_file)
 
+# init flags
+shares = 0
+results = {}
+
+# loop thru df rows
+for i, row in df.iterrows():
+
+    if shares == 0 and row['Return'] > 0:
+        shares = 100/(row['Adj Close'])
+
+    if shares > 0 and row['Return'] < 0:
+        net = 100 - (shares * (row['Adj Close']))
+        results.update({i: net})
+        shares = 0
 
 
+x = [x for x in results.keys()]
+y = [y for x,y in results.items()]
+
+plt.plot(x,y)
+plt.xlabel('Time')
+plt.ylabel('Return')
+plt.title('Naive Strategy')
+plt.show()
 
 
