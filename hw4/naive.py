@@ -40,9 +40,11 @@ for i, row in df.iterrows():
         shares = 0
 
 
+# Plot points
 x = [x for x in results.keys()]
 y = [y for x,y in results.items()]
 
+# Show plot
 plt.plot(x,y)
 plt.xlabel('Time')
 plt.ylabel('Return')

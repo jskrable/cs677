@@ -34,16 +34,20 @@ std = df.groupby([pd.Grouper(key='Date', freq='W')])['Return'].std().mean()
 
 
 # Helper functions
+# Calculate single week's net return
 def net(week):
     week = week.to_numpy()
     return (week[-1] - week[0])/week[0]
 
 
+# Calculate bool for week's volatility
 def vol(week):
     w_std = week.std()
+    # Consider volatile if weekly standard dev > overall mean weekly std dev
     return True if w_std > std else False
 
 
+# Perform group functions
 def grp_vol(grp):
     grp['Vol'] = vol(grp['Return'])
     return grp
@@ -59,30 +63,38 @@ def grp_mean_return(grp):
     return grp
 
 
+# Apply group calculations and return to parent df
 def group_apply(data, group):
-    # if data.loc[data['Year'].isin(years)]:
     data['Net'] = group.apply(grp_net)['Net']
     data['Vol'] = group.apply(grp_vol)['Vol']
     data['Avg Return'] = group.apply(grp_mean_return)['Avg Return']
-    data['Score'] = data.apply((lambda x: 1 if x['Vol'] == False and x['Net'] > 0 else 0), axis=1)
+    data['Score'] = data.apply(
+        (lambda x: 1 if x['Vol'] == False and x['Net'] > 0 else 0), axis=1)
 
 
+# Plot weekly summary data for specific years
 def plot_weekly_summary(data, years):
+    # Filter df on year
     filtered = data.loc[data['Year'].isin(years)]
-    weekly_return = filtered.groupby([pd.Grouper(key='Date', freq='W')])['Return'].agg(list)
-    weekly_score = filtered.groupby([pd.Grouper(key='Date', freq='W')])['Score'].mean()
+    # Get weekly data
+    weekly_return = filtered.groupby([pd.Grouper(key='Date', freq='W')])[
+        'Return'].agg(list)
+    weekly_score = filtered.groupby([pd.Grouper(key='Date', freq='W')])[
+        'Score'].mean()
+    # Get plot points
     x = [np.mean(np.array(i)) for i in weekly_return]
     y = [np.std(np.array(i)) for i in weekly_return]
-    s = [abs(ret)*1000 for ret in x]
+    # Increase size for visibility
+    s = [abs(ret)*2500 for ret in x]
+    # Set color based on score calculated above
     c = ['green' if x > 0 else 'red' for x in weekly_score]
 
+    # Plot
     plt.scatter(x, y, s=s, color=c)
     plt.xlabel('Mean Weekly Return')
     plt.ylabel('Weekly Standard Deviation')
-    plt.axvline(linewidth=0.25, color='b-')
-    plt.ylim(bottom=0)
-    # plt.hlines(linewidth=0.25, color='r')
-    # plt.axhline()
+    # plt.axvline(linewidth=0.25, color='b', linestyle='-')
+    plt.ylim(bottom=-0.001)
     plt.show()
 
 
@@ -91,6 +103,5 @@ def plot_weekly_summary(data, years):
 print('applying group functions...')
 group_apply(df, weekly)
 print('plotting...')
+# Plot for 2018
 plot_weekly_summary(df, [2018])
-
-
