@@ -78,7 +78,7 @@ def plot_weekly_summary(data, years):
     filtered = data.loc[data['Year'].isin(years)]
     # Get weekly data
     weekly_return = filtered.groupby([pd.Grouper(key='Date', freq='W')])[
-        'Return'].avg()
+        'Return'].agg(list)
     weekly_score = filtered.groupby([pd.Grouper(key='Date', freq='W')])[
         'Score'].mean()
     # Get plot points
@@ -100,8 +100,10 @@ def plot_weekly_summary(data, years):
 
 # MAIN
 #############################################################
-# print('applying group functions...')
-# group_apply(df, weekly)
-# print('plotting...')
-# # Plot for 2018
-# plot_weekly_summary(df, [2017, 2018])
+print('applying group functions...')
+group_apply(df, weekly)
+output_file = output_file.split('.')[0] + 'scored.csv'
+df.to_csv(output_file, index=False)
+print('plotting...')
+# Plot for 2018
+plot_weekly_summary(df, [2017, 2018])
