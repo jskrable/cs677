@@ -12,7 +12,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.neighbors import KNeighborsClassifier
-# import week_classifier as wk
 
 ticker = 'SYK'
 
@@ -21,15 +20,57 @@ if os.name == 'posix':
     input_dir = r'/home/jskrable/code/cs677/datasets'
 else:
     input_dir = r'C:\Users\jskrable\code\cs677\datasets'
-output_file = os.path.join(input_dir, ticker + '_scored.csv')
+output_file = os.path.join(input_dir, ticker + '.csv')
 
 # Read file into pandas dataframe
 df = pd.read_csv(output_file)
 
+
+# Helper functions
+# Calculate single week's net return
+def net(week):
+    week = week.to_numpy()
+    return (week[-1] - week[0])/week[0]
+
+
+# Calculate bool for week's volatility
+def vol(week):
+    w_std = week.std()
+    # Consider volatile if weekly standard dev > overall mean weekly std dev
+    return True if w_std > std else False
+
+
+# Perform group functions
+def grp_vol(grp):
+    grp['Vol'] = vol(grp['Return'])
+    return grp
+
+
+def grp_net(grp):
+    grp['Net'] = net(grp['Adj Close'])
+    return grp
+
+
+def grp_mean_return(grp):
+    grp['Avg Return'] = grp['Return'].mean()
+    return grp
+
+
+# Apply group calculations and return to parent df
+def group_apply(data, group):
+    data['Net'] = group.apply(grp_net)['Net']
+    data['Vol'] = group.apply(grp_vol)['Vol']
+    data['Avg Return'] = group.apply(grp_mean_return)['Avg Return']
+    data['Score'] = data.apply(
+        (lambda x: 1 if x['Vol'] == False and x['Net'] > 0 else 0), axis=1)
+
+
 # Get weekly summary dataframe
 df['Date'] = pd.to_datetime(df['Date']) - pd.to_timedelta(7, unit='d')
+# Get weekly avg std dev for comparison
+std = df.groupby([pd.Grouper(key='Date', freq='W')])['Return'].std().mean()
 group = df.groupby([pd.Grouper(key='Date', freq='W')])
-# wk.group_apply(df,group)
+group_apply(df,group)
 weekly = group['Return'].mean().to_frame('Mean')
 weekly['Std'] = group['Return'].std()
 weekly['Score'] = group['Score'].first()
