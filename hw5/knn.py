@@ -23,8 +23,8 @@ else:
 output_file = os.path.join(input_dir, ticker + '.csv')
 
 # Read file into pandas dataframe
+print('Reading data file...')
 df = pd.read_csv(output_file)
-
 
 # Helper functions
 # Calculate single week's net return
@@ -66,6 +66,7 @@ def group_apply(data, group):
 
 
 # Get weekly summary dataframe
+print('Applying group functions...')
 df['Date'] = pd.to_datetime(df['Date']) - pd.to_timedelta(7, unit='d')
 # Get weekly avg std dev for comparison
 std = df.groupby([pd.Grouper(key='Date', freq='W')])['Return'].std().mean()
@@ -85,6 +86,7 @@ test = weekly.loc[weekly['Year'].isin([2018])]
 train = weekly.loc[weekly['Year'].isin([2017])]
 
 # Extract data for classification
+print('Preprocessing data...')
 x = weekly[['Mean', 'Std']].values
 x_train = train[['Mean', 'Std']].values
 y_train = train['Score'].values
@@ -101,6 +103,7 @@ x_test = scaler.transform(x_test)
 error_rate = {}
 Ks = [x for x in range(1, 22, 2)]
 for k in Ks:
+    print('Classifying with k:', k)
     knn = KNeighborsClassifier(n_neighbors=k)
     knn.fit(x_train, y_train)
     pred_k = knn.predict(x_test)
@@ -118,4 +121,5 @@ def error_plot(rate):
     plt.title('Error Rate vs. k: SYK Weekly Return Classifier')
     plt.show()
 
+print('Plotting results...')
 error_plot(error_rate)
