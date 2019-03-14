@@ -30,5 +30,6 @@ df.groupby('time')['tip_percent'].mean()
 #q2
 df.groupby(['day','time'])['tip_percent'].mean()
 
-#q3
-
+#q5
+df['smoker'].describe()['top']
+np.round(((len(df) - df['smoker'].describe()['freq']) / len(df))*100,2)
