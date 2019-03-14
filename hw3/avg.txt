@@ -1,0 +1,19 @@
+Simulating trades...
+Trying w= 10 k= 0.0
+Trying w= 10 k= 0.5
+Trying w= 10 k= 1.0
+Trying w= 10 k= 1.5
+Trying w= 10 k= 2.0
+Trying w= 10 k= 2.5
+Trying w= 10 k= 3.0
+Trying w= 20 k= 0.0
+Trying w= 20 k= 0.5
+Trying w= 20 k= 1.0
+Trying w= 20 k= 1.5
+Trying w= 20 k= 2.0
+Trying w= 20 k= 2.5
+Trying w= 20 k= 3.0
+Trying w= 30 k= 0.0
+Trying w= 30 k= 0.5
+Trying w= 30 k= 1.0
+Trying w= 30 k= 1.5
