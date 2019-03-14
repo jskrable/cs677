@@ -22,3 +22,13 @@ output_file = os.path.join(input_dir, 'tips.csv')
 print('Reading',output_file,'...')
 df = pd.read_csv(output_file)
 
+df['tip_percent'] = (df['tip'] / df['total_bill'])*100
+
+# q1
+df.groupby('time')['tip_percent'].mean()
+
+#q2
+df.groupby(['day','time'])['tip_percent'].mean()
+
+#q3
+
