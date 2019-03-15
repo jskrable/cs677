@@ -59,6 +59,25 @@ else:
     nonsmoker = np.round((df['smoker'].describe()['freq'] / len(df))*100,2)
 print(nonsmoker,'% of patrons are non-smokers\n')
 
+#q6
+print('Q6 ---------------------------------------------------------')
+df_tip_time = df['tip_percent'].reset_index().rename(index=str, columns={'index': 'time'})
+corr = df_tip_time.corr().time.tip_percent
+if corr > 0:
+    print('Assuming rows are in time order, the tipping percentage increases with time')
+else:
+    print('Assuming rows are in time order, the tipping percentage does not increase with time')
+
+print('Correlation of time to tip percent is',corr,'\n')
+
+#q7
+print('Q7 ---------------------------------------------------------')
+df_gender_time = df['sex'].reset_index().rename(index=str, columns={'index': 'time'})
+df_gender_time['sex'] = df_gender_time['sex'].apply(lambda x: 1 if x == 'Female' else 0)
+corr = df_gender_time.corr().time.sex
+print('Correlation of time to gender is',corr,'\n')
+print('A high positive correlation would mean more women come in as time increases\n')
+
 #q8
 print('Q8 ---------------------------------------------------------')
 df_tip_smoker = df[['tip_percent','smoker']]
@@ -70,7 +89,7 @@ print('The correlation between smokers and tipping is',corr,'\n')
 print('Q9 ---------------------------------------------------------')
 day_avg = df.groupby('day')['tip_percent'].mean()
 print('The average tip is highest on',day_avg.idxmax(),'\n')
-print(day_avg)
+print(day_avg,'\n')
 
 #q10
 print('Q10 --------------------------------------------------------')
@@ -79,4 +98,4 @@ f_smokers = np.round((len(females[females.smoker.str.contains('Yes')]) / len(fem
 males =  df[df.sex.str.contains('Male')]
 m_smokers = np.round((len(males[males.smoker.str.contains('Yes')]) / len(males)) * 100, 2)
 print(f_smokers,'% of females are smokers')
-print(m_smokers,'% of males are smokers')
+print(m_smokers,'% of males are smokers\n')
