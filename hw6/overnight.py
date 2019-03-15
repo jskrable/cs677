@@ -24,3 +24,8 @@ output_file = os.path.join(input_dir, ticker + '.csv')
 print('Reading data file...')
 df = pd.read_csv(output_file)
 
+subset = df[['Open','Close']]
+
+x = subset.iloc[10]
+
+y = subset.iloc(x.name -1)
