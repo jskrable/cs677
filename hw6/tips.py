@@ -99,3 +99,5 @@ males =  df[df.sex.str.contains('Male')]
 m_smokers = np.round((len(males[males.smoker.str.contains('Yes')]) / len(males)) * 100, 2)
 print(f_smokers,'% of females are smokers')
 print(m_smokers,'% of males are smokers\n')
+
+

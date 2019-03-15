@@ -11,8 +11,8 @@ import os
 import numpy as np 
 import pandas as pd
 import matplotlib.pyplot as plt
-import daily
-import monthly
+# import daily
+# import monthly
 
 def get_stock(ticker, start_date, end_date, s_window, l_window):
     try:
@@ -28,7 +28,7 @@ def get_stock(ticker, start_date, end_date, s_window, l_window):
         df['Short_MA'] = df['Adj Close'].rolling(window=s_window, min_periods=1).mean()
         df['Long_MA'] = df['Adj Close'].rolling(window=l_window, min_periods=1).mean()        
         col_list = ['Date', 'Year', 'Month', 'Day', 'Weekday',
-                    'High', 'Low', 'Close', 'Volume', 'Adj Close',
+                    'High', 'Low', 'Open', 'Close', 'Volume', 'Adj Close',
                     'Return', 'Short_MA', 'Long_MA']
         df = df[col_list]
         return df
@@ -48,15 +48,15 @@ else:
     input_dir = r'C:\Users\jskrable\code\cs677\datasets'
 output_file = os.path.join(input_dir, ticker + '.csv')
 
-# df = get_stock(ticker, start_date, end_date, s_window, l_window)
-# df.to_csv(output_file, index=False)
+df = get_stock(ticker, start_date, end_date, s_window, l_window)
+df.to_csv(output_file, index=False)
 
 
-with open(output_file) as f:
-    lines = f.read().splitlines()
+# with open(output_file) as f:
+#     lines = f.read().splitlines()
 
-    daily.strategy(lines)
-    monthly.strategy(lines)
+    # daily.strategy(lines)
+    # monthly.strategy(lines)
 
 
 
