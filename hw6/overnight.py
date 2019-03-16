@@ -47,10 +47,12 @@ def naive_on_inertia(df):
 def plot_returns(df):
     x = df['Overnight_Return'].values
     y = df['Return'].values
+    corr = np.round(df[['Overnight_Return','Return']].corr().Return.Overnight_Return, 5)
     plt.scatter(x,y)
     plt.xlabel('Overnight Returns')
     plt.ylabel('Daily Returns')
     plt.title('Daily Returns vs. Overnight Returns')
+    plt.text(-0.04, 0.07, 'corr = ' + str(corr))
     plt.show()
 
 
@@ -70,7 +72,7 @@ def minimum_rs(df):
     Rs = [r for r in range(-10,11)]
     results = {}
     for R in Rs:
-        print('Simulating with R:',R)
+        print('Simulating with r =',R)
         returns = df.apply(lambda x: on_inertia(x, R), axis=1)
         returns = returns[returns.isnull() == False]
         results.update({R: returns.mean()})
@@ -110,12 +112,12 @@ print('Q1: Naive Overnight Inertia --------------------------------------------'
 naive = naive_on_inertia(df)
 # plot_returns(naive)
 
-#Q2
+# Q2
 print('Q2: Algorithm Analysis -------------------------------------------------')
 print('Displaying plot...')
 plot_returns(df)
 
-#Q3
+# Q3
 print('Q3: Minimum Return Overnight Inertia -----------------------------------')
 R_results = minimum_rs(df)
 print('Displaying plot...')
