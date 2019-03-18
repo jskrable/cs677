@@ -66,7 +66,7 @@ corr = df_tip_time.corr().time.tip_percent
 if corr > 0:
     print('Assuming rows are in time order, the tipping percentage increases with time')
 else:
-    print('Assuming rows are in time order, the tipping percentage does not increase with time')
+    print('Assuming rows are in time order, the tipping percentage decreases with time')
 
 print('Correlation of time to tip percent is',corr,'\n')
 
@@ -76,7 +76,7 @@ df_gender_time = df['sex'].reset_index().rename(index=str, columns={'index': 'ti
 df_gender_time['sex'] = df_gender_time['sex'].apply(lambda x: 1 if x == 'Female' else 0)
 corr = df_gender_time.corr().time.sex
 print('Correlation of time to gender is',corr,'\n')
-print('A high positive correlation would mean more women come in as time increases\n')
+print('A correlation close to 1 would mean more women come in as time increases\n')
 
 #q8
 print('Q8 ---------------------------------------------------------')

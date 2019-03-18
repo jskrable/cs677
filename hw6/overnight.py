@@ -43,6 +43,13 @@ def naive_on_inertia(df):
     return returns
 
 
+# Runs overnight inertia strategy with specific change parameter after observing plot
+def improved_on_inertia(df):
+    returns = df.apply(lambda x: on_inertia(x, 0.04), axis=1)
+    returns = returns[returns.isnull() == False]
+    return returns
+
+
 # Plots return columns from dataframe
 def plot_returns(df):
     x = df['Overnight_Return'].values
@@ -108,17 +115,19 @@ shares = 0
 results = {}
 
 # Q1
-print('Q1: Naive Overnight Inertia --------------------------------------------')
+print('Pt. A: Naive Overnight Inertia --------------------------------------------')
 naive = naive_on_inertia(df)
-# plot_returns(naive)
+print('Mean return using naive overnight inertia strategy is', naive.mean())
 
 # Q2
-print('Q2: Algorithm Analysis -------------------------------------------------')
+print('Pt. B: Algorithm Analysis -------------------------------------------------')
 print('Displaying plot...')
 plot_returns(df)
+improved = improved_on_inertia(df)
+print('Mean return using improved overnight inertia strategy is', improved.mean())
 
 # Q3
-print('Q3: Minimum Return Overnight Inertia -----------------------------------')
+print('Pt. C: Minimum Return Overnight Inertia -----------------------------------')
 R_results = minimum_rs(df)
 print('Displaying plot...')
 plot_results(R_results)
