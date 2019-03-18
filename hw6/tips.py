@@ -54,9 +54,9 @@ print('The correlation between group size and tip is',corr,'\n')
 #q5
 print('Q5 ---------------------------------------------------------')
 if df['smoker'].describe()['top'] == 'No':
-    nonsmoker = np.round(((len(df) - df['smoker'].describe()['freq']) / len(df))*100,2)
-else:
     nonsmoker = np.round((df['smoker'].describe()['freq'] / len(df))*100,2)
+else:
+    nonsmoker = np.round(((len(df) - df['smoker'].describe()['freq']) / len(df))*100,2)
 print(nonsmoker,'% of patrons are non-smokers\n')
 
 #q6
@@ -64,9 +64,9 @@ print('Q6 ---------------------------------------------------------')
 df_tip_time = df['tip_percent'].reset_index().rename(index=str, columns={'index': 'time'})
 corr = df_tip_time.corr().time.tip_percent
 if corr > 0:
-    print('Assuming rows are in time order, the tipping percentage increases with time')
+    print('Assuming rows are in time order, the tipping percentage increases with time\n')
 else:
-    print('Assuming rows are in time order, the tipping percentage decreases with time')
+    print('Assuming rows are in time order, the tipping percentage decreases with time\n')
 
 print('Correlation of time to tip percent is',corr,'\n')
 
