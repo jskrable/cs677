@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 """
-naive_bayes.py
+regression_return_estimates.py
 03-31-19
 jack skrable
 """
@@ -10,12 +10,8 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from statistics import mode
-from sklearn.preprocessing import StandardScaler
-from sklearn.naive_bayes import GaussianNB
 
 ticker = 'SYK'
-label = True
 
 # Get path of set
 if os.name == 'posix':
@@ -28,34 +24,32 @@ output_file = os.path.join(input_dir, ticker + '_labelled.csv')
 print('Reading data file...')
 df = pd.read_csv(output_file)
 
-# Get weekly summary dataframe
-print('Applying group functions...')
-df['Date'] = pd.to_datetime(df['Date']) - pd.to_timedelta(7, unit='d')
-group = df.groupby([pd.Grouper(key='Date', freq='W')])
-weekly = group['Return'].mean().to_frame('Mean')
-weekly['Std'] = group['Return'].std()
-weekly['Score'] = group['Score'].first()
 
-# Extract data for classification
-print('Preprocessing data...')
-# Fill NaNs
-weekly = weekly.fillna(0)
-weekly = weekly.reset_index()
-x = weekly[['Mean', 'Std']].values
+# Function to predict return of next day using linear regression
+def predict_return(y, w):
 
-# Scale data
-scaler = StandardScaler()
-scaler.fit(x)
-x = scaler.transform(x)
+    # Do not attempt if there are not enough preceding days
+    if y.shape[0] < w:
+        return 0
+    else:
+        # Get x values
+        x = np.array([x for x in range(w - 1)])
+        # Polyfit weights for x and y
+        weights = np.polyfit(x,y[:-1],1)
+        # Model creation
+        model = np.poly1d(weights)
+        # Predict
+        prediction = model(w+1)
 
-# Test and training sets
-weekly['Mean'], weekly['Std'] = np.hsplit(scaler.transform(x),2)
-weekly = weekly[['Mean', 'Std', 'Score']]
-train = weekly[int(len(weekly)/2):]
-test = weekly[:int(len(weekly)/2)]
+        # Return rate
+        if prediction > y[-1]:
+            return 1
+        else:
+            return -1
 
-def split_set(data):
-    x = data[['Mean','Std']].values
-    y = data['Score'].values
-    return x, y
 
+print('Q2: Rolling Regression Predicted Returns---------------------')
+for w in [10,20,30]:
+    rate = df['Return'].rolling(window=(w+1), min_periods=1).apply(lambda x: predict_return(x, (w+1)), raw=True)
+
+    print('W:', w, 'Rate:', rate.sum())
