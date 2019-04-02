@@ -42,14 +42,15 @@ def predict_return(y, w):
         prediction = model(w+1)
 
         # Return rate
-        if prediction > y[-1]:
+        if (prediction > 0 and y[-1] > 0) or (prediction < 0 and y[-1] < 0):
             return 1
         else:
-            return -1
+            return 0
 
 
 print('Q2: Rolling Regression Predicted Returns---------------------')
 for w in [10,20,30]:
     rate = df['Return'].rolling(window=(w+1), min_periods=1).apply(lambda x: predict_return(x, (w+1)), raw=True)
 
-    print('W:', w, 'Rate:', rate.sum())
+    success_rate = np.round((rate.sum()/rate.shape[0]), 4)*100
+    print('W:', w, '          Success Rate:', success_rate, '%')
