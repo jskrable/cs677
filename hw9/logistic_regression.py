@@ -10,6 +10,8 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
 
 ticker = 'SYK'
 
@@ -56,8 +58,9 @@ def remove_points(row):
 def plot_points(x, y, c, title):
 	plt.scatter(x, y, color=c)
 	x_line = np.linspace(min(x),max(x)+0.01)
-	y_line = [0.7*x + 0.01 for x in x_line]
-	plt.plot(x_line, y_line, '--')
+	y_line_1 = [0.7*x + 0.01 for x in x_line]
+	# y_line_2 = 
+	plt.plot(x_line, y_line_1, '--')
 	plt.xlabel('Mean Weekly Return')
 	plt.ylabel('Std Deviation')
 	plt.title(title)
@@ -84,4 +87,48 @@ c = ['green' if x > 0 else 'red' for x in cleaned.Score]
 t = 'Cleaned Plot'
 plot_points(x,y,c,t)
 
+X = cleaned[['Std','Mean']].values
+scaler = StandardScaler()
+scaler.fit(X)
+X = scaler.transform(X)
+y = cleaned['Score'].values
 
+lrc = LogisticRegression(solver='lbfgs')
+lrc.fit(X,y)
+
+sns.regplot(x='Mean',y='Std',data=cleaned,logistic=True)     
+
+
+def prediction(df):
+
+	print('Preprocessing data...')
+	X = df[['Mean','Std']].values
+	X_train = df.loc['2017'][['Mean','Std']].values
+	y_train = df.loc['2017']['Score'].values
+	X_test = df.loc['2018'][['Mean','Std']].values
+	y_test = df.loc['2018']['Score'].values
+	scaler = StandardScaler()
+	scaler.fit(X)
+	X_train = scaler.transform(X_train)
+	X_test = scaler.transform(X_test)
+
+	print('Training model...')
+	lrc = LogisticRegression(solver='lbfgs')
+	lrc.fit(X_train, y_train)
+
+	print('Testing model...')
+	prediction = lrc.predict(X_test)
+	accuracy = np.mean(prediction == y_test)
+
+	return accuracy
+
+# MAIN
+###############################################################################
+
+
+print('Q4: Logistic Regression Classifier------------------------------------')
+accuracy = prediction(weekly)
+print('Accuracy:', np.round(accuracy * 100, 2), '%')
+
+
+	
