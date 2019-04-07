@@ -10,8 +10,93 @@ import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
+
+
+# Function to return False for bad data points
+def remove_points(row):
+	# Calculate linear guess
+	slope = 0.7 * row.Mean + 0.01
+
+	if slope < row.Std and row.Score == 0:
+		return True
+	elif slope > row.Std and row.Score ==1:
+		return True
+	else:
+		return False
+
+
+# Function to plot logistic regression line and drawn line on sep. dataset
+def logistic_separation(df):
+
+	# Scale data
+	print('Preprocessing...')
+	X = df[['Std','Mean']].values
+	scaler = StandardScaler()
+	scaler.fit(X)
+	X = scaler.transform(X)
+	y = df['Score'].values
+
+	# Train model
+	print('Training regression model...')
+	lrc = LogisticRegression(solver='lbfgs')
+	lrc.fit(X,y)
+
+	# Get graph data
+	print('Plotting graphs...')
+	xx, yy = np.hsplit(X,2)
+	x_range = np.linspace(xx.min(), xx.max())
+	y_drawn = [0.7 * x + 0.01 for x in x_range]
+	y_log = [lrc.coef_[0][1] * x + lrc.intercept_[0] for x in x_range]
+
+	# Plot graphs
+	sns.scatterplot(xx.ravel(), yy.ravel(), hue=y, palette={1:'olivedrab',0:'firebrick'})
+	sns.lineplot(x_range, y_drawn, label='drawn')
+	sns.lineplot(x_range, y_log, label='regression')
+
+	# Add labels
+	plt.xlabel('Mean Weekly Return')
+	plt.ylabel('Std Deviation')
+	plt.title('Scaled Mean Return vs. Std. Deviation: Logistic Regression Line')
+	plt.show()
+
+	return 0
+
+# Function to predict 2018 labels using logistic regression
+def prediction(df):
+
+	print('Preprocessing data...')
+	X = df[['Mean','Std']].values
+	# Get train and test sets by year
+	X_train = df.loc['2017'][['Mean','Std']].values
+	y_train = df.loc['2017']['Score'].values
+	X_test = df.loc['2018'][['Mean','Std']].values
+	y_test = df.loc['2018']['Score'].values
+	# Train scaler
+	scaler = StandardScaler()
+	scaler.fit(X)
+	# Scale datasets
+	X_train = scaler.transform(X_train)
+	X_test = scaler.transform(X_test)
+
+	# Train model
+	print('Training model...')
+	lrc = LogisticRegression(solver='lbfgs')
+	lrc.fit(X_train, y_train)
+
+	# Evaluate model
+	print('Testing model...')
+	prediction = lrc.predict(X_test)
+	accuracy = np.mean(prediction == y_test)
+
+	return accuracy
+
+
+
+# MAIN
+###############################################################################
 
 ticker = 'SYK'
 
@@ -39,92 +124,11 @@ weekly['Score'] = group['Score'].first()
 print('Preprocessing data...')
 # Fill NaNs
 weekly = weekly.fillna(0)
-# weekly = weekly.reset_index()
 
-# Function to return False for bad data points
-def remove_points(row):
-	# Calculate linear guess
-	slope = 0.7 * row.Mean + 0.01
-
-	if slope < row.Std and row.Score == 0:
-		return True
-	elif slope > row.Std and row.Score ==1:
-		return True
-	else:
-		return False
-
-
-# Function to plot both graphs
-def plot_points(x, y, c, title):
-	plt.scatter(x, y, color=c)
-	x_line = np.linspace(min(x),max(x)+0.01)
-	y_line_1 = [0.7*x + 0.01 for x in x_line]
-	# y_line_2 = 
-	plt.plot(x_line, y_line_1, '--')
-	plt.xlabel('Mean Weekly Return')
-	plt.ylabel('Std Deviation')
-	plt.title(title)
-	plt.show()
-
-
-# Plot initial graph with simple linear separator
-print('Plotting inital graph...')
-x = [x for x in weekly.Mean]
-y = [y for y in weekly.Std]
-c = ['green' if x > 0 else 'red' for x in weekly.Score]
-t = 'Best-Guess Linear Separator'
-plot_points(x,y,c,t)
-
-# Create cleaned df
+print('Q3: Logistic Regression Plot------------------------------------------')
 print('Cleaning data...')
 cleaned = weekly[weekly.apply(remove_points, axis=1)]
-
-# Plot cleaned graph with simple linear separator
-print('Plotting cleaned graph...')
-x = [x for x in cleaned.Mean]
-y = [y for y in cleaned.Std]
-c = ['green' if x > 0 else 'red' for x in cleaned.Score]
-t = 'Cleaned Plot'
-plot_points(x,y,c,t)
-
-X = cleaned[['Std','Mean']].values
-scaler = StandardScaler()
-scaler.fit(X)
-X = scaler.transform(X)
-y = cleaned['Score'].values
-
-lrc = LogisticRegression(solver='lbfgs')
-lrc.fit(X,y)
-
-sns.regplot(x='Mean',y='Std',data=cleaned,logistic=True)     
-
-
-def prediction(df):
-
-	print('Preprocessing data...')
-	X = df[['Mean','Std']].values
-	X_train = df.loc['2017'][['Mean','Std']].values
-	y_train = df.loc['2017']['Score'].values
-	X_test = df.loc['2018'][['Mean','Std']].values
-	y_test = df.loc['2018']['Score'].values
-	scaler = StandardScaler()
-	scaler.fit(X)
-	X_train = scaler.transform(X_train)
-	X_test = scaler.transform(X_test)
-
-	print('Training model...')
-	lrc = LogisticRegression(solver='lbfgs')
-	lrc.fit(X_train, y_train)
-
-	print('Testing model...')
-	prediction = lrc.predict(X_test)
-	accuracy = np.mean(prediction == y_test)
-
-	return accuracy
-
-# MAIN
-###############################################################################
-
+logistic_separation(cleaned)
 
 print('Q4: Logistic Regression Classifier------------------------------------')
 accuracy = prediction(weekly)
