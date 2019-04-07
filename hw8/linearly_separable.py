@@ -57,7 +57,7 @@ def plot_points(x, y, c, title):
 	plt.scatter(x, y, color=c)
 	x_line = np.linspace(min(x),max(x)+0.01)
 	y_line = [0.7*x + 0.01 for x in x_line]
-	plt.plot(x_line, y_line)
+	plt.plot(x_line, y_line, '--')
 	plt.xlabel('Mean Weekly Return')
 	plt.ylabel('Std Deviation')
 	plt.title(title)
