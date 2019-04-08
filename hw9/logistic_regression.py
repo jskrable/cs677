@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # coding: utf-8
 """
-naive_bayes.py
-03-31-19
+logistic_regression.py
+04-07-19
 jack skrable
 """
 
