@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # coding: utf-8
 """
-naive_bayes.py
-03-31-19
+logistic_regression.py
+04-07-19
 jack skrable
 """
 
@@ -28,6 +28,10 @@ def remove_points(row):
 		return False
 
 
+def sigmoid(x):
+	return 1 / (1 + np.exp(-x))
+
+
 # Function to plot logistic regression line and drawn line on sep. dataset
 def logistic_separation(df):
 
@@ -44,12 +48,18 @@ def logistic_separation(df):
 	lrc = LogisticRegression(solver='lbfgs')
 	lrc.fit(X,y)
 
+	lr_a = lrc.coef_[0][1]
+	lr_b = lrc.intercept_[0]
+
+	# Display line equations
+	print('Custom drawn line: a =',str(0.7),'b =',str(0.01))
+	print('Logistic regression line: a =',str(lr_a),'b =',str(lr_b))
 	# Get graph data
 	print('Plotting graphs...')
 	xx, yy = np.hsplit(X,2)
 	x_range = np.linspace(xx.min(), xx.max())
 	y_drawn = [0.7 * x + 0.01 for x in x_range]
-	y_log = [lrc.coef_[0][1] * x + lrc.intercept_[0] for x in x_range]
+	y_log = [sigmoid(lrc.coef_[0][1] * x + lrc.intercept_[0]) for x in x_range]
 
 	# Plot graphs
 	sns.scatterplot(xx.ravel(), yy.ravel(), hue=y, palette={1:'olivedrab',0:'firebrick'})
