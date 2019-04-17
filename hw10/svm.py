@@ -58,15 +58,27 @@ scaler.fit(x)
 x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
-# Train SVM classifier
-print('Fitting SVM...')
-svm_classifier = svm.SVC(kernel = 'linear')
-svm_classifier.fit(x_train,y_train)
+def run_svm(kind):
+    # Train SVM classifier
+    print('Fitting',kind,'SVM...')
+    if kind == 'poly':
+        svm_classifier = svm.SVC(kernel=kind, degree=2, gamma='auto')
+    else:
+        svm_classifier = svm.SVC(kernel=kind, gamma='auto')
+    svm_classifier.fit(x_train,y_train)
 
-# Test classifier
-print('Testing SVM classifier...')
-y_pred = svm_classifier.predict(x_test)
-error_rate = np.mean(y_pred != y_test)
+    # Test classifier
+    print('Testing',kind,'SVM classifier...')
+    y_pred = svm_classifier.predict(x_test)
+    error_rate = np.mean(y_pred != y_test)
+
+    return np.round(1 - error_rate, 4) * 100
+
+linear = run_svm('linear')
+gaussian = run_svm('rbf')
+poly = run_svm('poly')
 
 print('Complete---------------------')
-print('accuracy: ',np.round(1 - error_rate, 4) * 100,'%')
+print('Linear Accuracy:',linear,'%')
+print('Gaussian Accuracy:',gaussian,'%')
+print('Polynomial Accuracy:',poly,'%')
