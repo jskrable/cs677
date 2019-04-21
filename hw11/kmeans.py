@@ -7,6 +7,7 @@ jack skrable
 """
 
 import os
+import copy
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -122,6 +123,107 @@ def find_best_k(X):
     plt.show()
 
 
+def examine_best_k(X, y):
+
+    print('Clustering...')
+    # Config kmeans
+    km = kmeans(X, 7)
+    y_km = km.predict(X)
+    print('Processing...')
+    df = pd.DataFrame({'mean':X[:,0],'std':X[:,1],'cluster':y_km,'label':y.ravel()})
+    ct = df.groupby(['cluster','label']).label.count()
+    cs = ct / df.groupby(['cluster']).label.count()
+
+    print('Displaying label distibution by cluster:')
+    for g,p in cs.iteritems():
+        print('Cluster',g[0],'Label:',g[1],np.round(p*100),'%') 
+
+
+def custom_kmeans(df, k, o):
+
+    def assignment(df, centroids, o=2):
+        for i in centroids.keys():
+                # sqrt((x1 - x2)^2 - (y1 - y2)^2)
+                df['distance_from_{}'.format(i)] = (
+                    (np.abs(df['x'] - centroids[i][0]) ** o + 
+                     np.abs(df['y'] - centroids[i][1]) ** o) ** (1/o)
+                    )
+        centroid_distance_cols = ['distance_from_{}'.format(i) for i in centroids.keys()]
+        df['closest'] = df.loc[:, centroid_distance_cols].idxmin(axis=1)
+        df['closest'] = df['closest'].map(lambda x: int(x.lstrip('distance_from_')))
+        df['color'] = df['closest'].map(lambda x: colmap[x])
+        return df
+
+
+    def update(k):
+        for i in centroids.keys():
+            centroids[i][0] = np.mean(df[df['closest'] == i]['x'])
+            centroids[i][1] = np.mean(df[df['closest'] == i]['y'])
+        return k
+
+    np.random.seed(200)
+    centroids = {
+        i+1: [np.random.uniform(df.x.min(), df.x.max()),
+              np.random.uniform(df.y.min(), df.y.max())]
+        for i in range(k)
+    }
+
+    fig = plt.figure(figsize=(5, 5))
+    plt.scatter(df['x'], df['y'], color='k')
+    colmap = {1: 'r', 2: 'g', 3: 'b'}
+    for i in centroids.keys():
+        plt.scatter(*centroids[i], color=colmap[i])
+
+    df = assignment(df, centroids, o)
+    print(df.head())
+
+    fig = plt.figure(figsize=(5, 5))
+    plt.scatter(df['x'], df['y'], color=df['color'], alpha=0.5, edgecolor='k')
+    for i in centroids.keys():
+        plt.scatter(*centroids[i], color=colmap[i])
+    plt.show()
+
+    old_centroids = copy.deepcopy(centroids)
+
+    centroids = update(centroids)
+        
+    fig = plt.figure(figsize=(5, 5))
+    ax = plt.axes()
+    plt.scatter(df['x'], df['y'], color=df['color'], alpha=0.5, edgecolor='k')
+    for i in centroids.keys():
+        plt.scatter(*centroids[i], color=colmap[i])
+    for i in old_centroids.keys():
+        old_x = old_centroids[i][0]
+        old_y = old_centroids[i][1]
+        dx = (centroids[i][0] - old_centroids[i][0]) * 0.75
+        dy = (centroids[i][1] - old_centroids[i][1]) * 0.75
+        # ax.arrow(old_x, old_y, dx, dy, head_width=2, head_length=3, fc=colmap[i], ec=colmap[i])
+    plt.show()
+
+    # repeat assignment stage
+    df = assignment(df, centroids)
+
+    # Plot results
+    fig = plt.figure(figsize=(5, 5))
+    plt.scatter(df['x'], df['y'], color=df['color'], alpha=0.5, edgecolor='k')
+    for i in centroids.keys():
+        plt.scatter(*centroids[i], color=colmap[i])
+    plt.show()
+
+    # run additional iterations
+    # Continue until all assigned categories don't change any more
+    while True:
+        closest_centroids = df['closest'].copy(deep=True)
+        centroids = update(centroids)
+        df = assignment(df, centroids)
+        if closest_centroids.equals(df['closest']):
+            break
+
+    fig = plt.figure(figsize=(5, 5))
+    plt.scatter(df['x'], df['y'], color=df['color'], alpha=0.5, edgecolor='k')
+    for i in centroids.keys():
+        plt.scatter(*centroids[i], color=colmap[i])
+    plt.show()
 
 # MAIN
 ##########################################################################
@@ -130,3 +232,6 @@ simple_5(x)
 
 print('Q2---------------------------------------------------------------')
 find_best_k(x)
+
+print('Q3---------------------------------------------------------------')
+examine_best_k(x, y)
