@@ -151,7 +151,7 @@ def custom_kmeans(df, k, o):
         centroid_distance_cols = ['distance_from_{}'.format(i) for i in centroids.keys()]
         df['closest'] = df.loc[:, centroid_distance_cols].idxmin(axis=1)
         df['closest'] = df['closest'].map(lambda x: int(x.lstrip('distance_from_')))
-        df['color'] = df['closest'].map(lambda x: colmap[x])
+        # df['color'] = df['closest'].map(lambda x: colmap[x])
         return df
 
 
@@ -161,6 +161,36 @@ def custom_kmeans(df, k, o):
             centroids[i][1] = np.mean(df[df['closest'] == i]['y'])
         return k
 
+
+    def plot(title, df, centroids=None):
+
+        try:
+            pal = sns.hls_palette(n_colors=k, l=0.6)
+            sns.scatterplot(df.x, df.y, hue=df.closest, palette=pal)
+
+        except AttributeError:
+            pal = sns.hls_palette(n_colors=k, l=0.6)
+            sns.scatterplot(df.x, df.y, palette=pal)
+
+        # Plot centroids
+        if centroids is not None:
+            pal = sns.hls_palette(n_colors=k, l=0.4)
+            vals = np.array(list(centroids.values()))
+            sns.scatterplot(vals[:,0], vals[:,1], s=250,
+                            marker='*', hue=[i for i in range(k)],
+                            palette=pal, legend=False)
+        plt.title(title)
+        plt.grid()
+        plt.show()
+
+
+    if o == 1:
+        kind = 'Euclidean'
+    elif o == 1.5:
+        kind = 'Minkowski'
+    elif o == 2:
+        kind = 'Manhattan'
+
     np.random.seed(200)
     centroids = {
         i+1: [np.random.uniform(df.x.min(), df.x.max()),
@@ -168,62 +198,39 @@ def custom_kmeans(df, k, o):
         for i in range(k)
     }
 
-    fig = plt.figure(figsize=(5, 5))
-    plt.scatter(df['x'], df['y'], color='k')
-    colmap = {1: 'r', 2: 'g', 3: 'b'}
-    for i in centroids.keys():
-        plt.scatter(*centroids[i], color=colmap[i])
+
+    plot('Initial Centroids: ' + kind, df, centroids)
 
     df = assignment(df, centroids, o)
-    print(df.head())
 
-    fig = plt.figure(figsize=(5, 5))
-    plt.scatter(df['x'], df['y'], color=df['color'], alpha=0.5, edgecolor='k')
-    for i in centroids.keys():
-        plt.scatter(*centroids[i], color=colmap[i])
-    plt.show()
+    plot('Initial Assignment: ' + kind, df, centroids)    
 
     old_centroids = copy.deepcopy(centroids)
 
     centroids = update(centroids)
-        
-    fig = plt.figure(figsize=(5, 5))
-    ax = plt.axes()
-    plt.scatter(df['x'], df['y'], color=df['color'], alpha=0.5, edgecolor='k')
-    for i in centroids.keys():
-        plt.scatter(*centroids[i], color=colmap[i])
-    for i in old_centroids.keys():
-        old_x = old_centroids[i][0]
-        old_y = old_centroids[i][1]
-        dx = (centroids[i][0] - old_centroids[i][0]) * 0.75
-        dy = (centroids[i][1] - old_centroids[i][1]) * 0.75
-        # ax.arrow(old_x, old_y, dx, dy, head_width=2, head_length=3, fc=colmap[i], ec=colmap[i])
-    plt.show()
+    
+    plot('Initial Update: ' + kind, df, centroids)
 
     # repeat assignment stage
     df = assignment(df, centroids)
 
     # Plot results
-    fig = plt.figure(figsize=(5, 5))
-    plt.scatter(df['x'], df['y'], color=df['color'], alpha=0.5, edgecolor='k')
-    for i in centroids.keys():
-        plt.scatter(*centroids[i], color=colmap[i])
-    plt.show()
+    plot('Second Assignment: ' + kind, df, centroids)
 
     # run additional iterations
     # Continue until all assigned categories don't change any more
+    i = 0
     while True:
         closest_centroids = df['closest'].copy(deep=True)
         centroids = update(centroids)
         df = assignment(df, centroids)
+        i += 1
         if closest_centroids.equals(df['closest']):
             break
 
-    fig = plt.figure(figsize=(5, 5))
-    plt.scatter(df['x'], df['y'], color=df['color'], alpha=0.5, edgecolor='k')
-    for i in centroids.keys():
-        plt.scatter(*centroids[i], color=colmap[i])
-    plt.show()
+    plot('Final Assignments: ' + kind, df, centroids)
+    print('Final Group Counts:', kind)
+    print(df.groupby(['closest']).count().x)
 
 # MAIN
 ##########################################################################
@@ -235,3 +242,9 @@ find_best_k(x)
 
 print('Q3---------------------------------------------------------------')
 examine_best_k(x, y)
+
+print('Q4---------------------------------------------------------------')
+df1 = pd.DataFrame({'x':x[:,0], 'y':x[:,1]})
+custom_kmeans(df1, 3, 1)
+custom_kmeans(df1, 3, 1.5)
+custom_kmeans(df1, 3, 2)
