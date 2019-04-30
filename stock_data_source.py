@@ -36,7 +36,7 @@ def get_stock(ticker, start_date, end_date, s_window, l_window):
         print(error)
         return None
 
-ticker='SYK'
+ticker='BSX'
 start_date='2014-01-01'
 end_date='2018-12-31'
 s_window = 14
